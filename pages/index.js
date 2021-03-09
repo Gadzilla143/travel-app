@@ -14,6 +14,7 @@ class Index extends React.Component {
         filteredCountries: null,
         type: 'ru'
     }
+    // test
 
     componentDidMount() {
         if (localStorage.getItem('lang')) {
