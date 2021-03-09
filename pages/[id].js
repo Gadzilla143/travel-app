@@ -16,6 +16,7 @@ class SingleCountry extends React.Component {
         isAuth: false,
         rates: {},
         date: null,
+        offset: null,
         temp: null,
         wind: null
     }
@@ -48,6 +49,7 @@ class SingleCountry extends React.Component {
                 options.timeZoneName = 'short';
                 this.setState({
                     date: new Intl.DateTimeFormat('en-AU', options).format(date),
+                    offset: response.data.offset,
                 });
             }
         })
@@ -116,6 +118,8 @@ class SingleCountry extends React.Component {
                 RATES[EUR]: {this.state.rates.eur}
                 <br/>
                 TIME:{this.state.date}
+                <br/>
+                OFFSET: {this.state.offset}
                 <br/>
                 TEMPERATURE:{this.state.temp}
                 <br/>
