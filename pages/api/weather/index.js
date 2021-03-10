@@ -11,7 +11,7 @@ export default async (req, res) => {
                 lon: response.data.coord.lon,
                 lat: response.data.coord.lat,
             },
-            temp: +result.toFixed(2),
+            temp: +result.toFixed(1),
             wind: response.data.wind.speed
         }
     })
