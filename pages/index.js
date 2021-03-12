@@ -247,11 +247,11 @@ class Index extends React.Component {
                                                             initialRating={this.getRating(country.rating)}
                                                     />
                                                     <p>{country.name}</p>
-                                                    <img src={country.flagImageUrl} alt={country.flagImageUrl}/>
-                                                    <img src={country.urlImage} alt={country.urlImage}/>
+                                                    <img src={country.flagImageUrl} alt={country.flagImageUrl} />
+                                                    <img src={country.urlImage} alt={country.urlImage} style={{width: "100%"}}/>
                                                     <p>{country.capital}</p>
                                                     <p>{country.capital_description}</p>
-                                                    <img src={country.capitalImageUrl} alt={country.capitalImageUrl}/>
+                                                    <img src={country.capitalImageUrl} alt={country.capitalImageUrl} style={{width: "100%"}} />
                                                     <hr/>
                                                 </div>
                                             </Link>

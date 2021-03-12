@@ -144,7 +144,7 @@ class SingleCountry extends React.Component {
                         return (
                             <li key={index}>
                                 <p>{attraction.title}</p>
-                                <img src={attraction.imageUrl} alt={attraction.imageUrl}/>
+                                <img src={attraction.imageUrl} alt={attraction.imageUrl} style={{width: "100%"}}/>
                                 <p>{attraction.description}</p>
                             </li>
                         )

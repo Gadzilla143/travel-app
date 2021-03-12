@@ -11,7 +11,7 @@ export default function App({Component, pageProps}) {
     return (
         <>
             <Head>
-                <title>Travel App</title>
+                <title>Travel2 App</title>
                 <link href='https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.css' rel='stylesheet' />
                 {/*<link rel="icon" href="/favicon.ico"/>*/}
             </Head>
