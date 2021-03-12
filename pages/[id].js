@@ -1,15 +1,24 @@
 import {withRouter} from "next/router";
 import axios from "axios";
-import styles from '../styles/Country_id.module.css'
+import styles from "../styles/Country_id.module.css";
 import Link from "next/link";
 import React from "react";
-import mapboxgl from 'mapbox-gl'
-import Rating from 'react-rating';
+import mapboxgl from "mapbox-gl";
+import Rating from "react-rating";
+import {Swiper, SwiperSlide} from "swiper/react";
+import SwiperCore, {A11y, EffectCube, Navigation, Pagination, Scrollbar,} from "swiper";
+import "video-react/dist/video-react.css";
+
+SwiperCore.use([Navigation, Pagination, Scrollbar, A11y, EffectCube]);
 
 class SingleCountry extends React.Component {
-
     state = {
         id: null,
+        capitalImg: [],
+        capital_description: [],
+        capital: [],
+        capitalData: [],
+        videoUrl: null,
         currency: null,
         attractions: [],
         rating: [],
@@ -18,93 +27,113 @@ class SingleCountry extends React.Component {
         date: null,
         offset: null,
         temp: null,
-        wind: null
-    }
+        wind: null,
+    };
 
     getData = () => {
-        const alias = this.props.router.query.id
-        const {currency, attractions, rating} = JSON.parse(this.props.router.query.data)
+        const alias = this.props.router.query.id;
+        const {
+            currency,
+            attractions,
+            rating,
+            capitalImg,
+            videoUrl,
+            capital_description,
+            capital,
+        } = JSON.parse(this.props.router.query.data);
+
         this.setState({
             id: this.props.router.query.id,
             currency,
             attractions,
-            rating
-        })
+            rating,
+            capitalImg,
+            videoUrl,
+            capital_description,
+            capital,
+        });
         // CURRENCY
-        axios.post('/api/currency', {currency}).then((response) => {
+        axios.post("/api/currency", {currency}).then((response) => {
             if (!response.data.error) {
                 this.setState({rates: response.data.data});
             }
-        })
+        });
         // TIME
-        axios.post('/api/time', {alias}).then((response) => {
+        axios.post("/api/time", {alias}).then((response) => {
             if (!response.data.error) {
                 const date = Date.parse(response.data.data);
                 const options = {
-                    year: 'numeric', month: 'numeric', day: 'numeric',
-                    hour: 'numeric', minute: 'numeric', second: 'numeric',
-                    hour12: false
+                    year: "numeric",
+                    month: "numeric",
+                    day: "numeric",
+                    hour: "numeric",
+                    minute: "numeric",
+                    second: "numeric",
+                    hour12: false,
                 };
-                options.timeZone = 'UTC';
-                options.timeZoneName = 'short';
+                options.timeZone = "UTC";
+                options.timeZoneName = "short";
                 this.setState({
-                    date: new Intl.DateTimeFormat('en-AU', options).format(date),
+                    date: new Intl.DateTimeFormat("en-AU", options).format(date),
                     offset: response.data.offset,
                 });
             }
-        })
+        });
         // WEATHER
-        axios.post('/api/weather', {alias}).then((response) => {
+        axios.post("/api/weather", {alias}).then((response) => {
             if (!response.data.error) {
                 this.setState({
                     temp: response.data.data.temp,
                     wind: response.data.data.wind,
                 });
-                mapboxgl.accessToken = 'pk.eyJ1Ijoic2xhdmFpZGVyIiwiYSI6ImNrbHhxY20xNDF2bDEyb3Azc2h6M3gydW4ifQ.lIJ0H5bCqxE7JmW892Hc6g';
+                mapboxgl.accessToken =
+                    "pk.eyJ1Ijoic2xhdmFpZGVyIiwiYSI6ImNrbHhxY20xNDF2bDEyb3Azc2h6M3gydW4ifQ.lIJ0H5bCqxE7JmW892Hc6g";
                 new mapboxgl.Map({
-                    container: 'map',
-                    style: 'mapbox://styles/mapbox/streets-v11',
+                    container: "map",
+                    style: "mapbox://styles/mapbox/streets-v11",
                     center: [response.data.data.cords.lon, response.data.data.cords.lat], // starting position [lng, lat]
-                    zoom: 9 // starting zoom
+                    zoom: 9, // starting zoom
                 });
             }
-        })
-    }
+        });
+    };
 
     componentDidMount() {
         if (this.props.router.query.data) {
-            this.getData()
+            this.getData();
         }
-        const id = localStorage.getItem('user')
+        const id = localStorage.getItem("user");
         if (id) {
-            const user = {id, type: 'auto_login'};
-            axios.post('/api/auth', {user}).then((response) => {
+            const user = {id, type: "auto_login"};
+            axios.post("/api/auth", {user}).then((response) => {
                 if (!response.data.error) {
-                    localStorage.setItem('name', response.data.name)
-                    localStorage.setItem('avatar', response.data.imageUrl)
-                    localStorage.setItem('user', response.data.id)
-                    this.setState({isAuth: true})
+                    localStorage.setItem("name", response.data.name);
+                    localStorage.setItem("avatar", response.data.imageUrl);
+                    localStorage.setItem("user", response.data.id);
+                    this.setState({isAuth: true});
                 }
-            })
+            });
         }
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (prevProps !== this.props) {
-            this.getData()
+            this.getData();
         }
     }
 
     Rate = (value) => {
-        const id = localStorage.getItem('user')
-        const name = localStorage.getItem('name')
-        const alias = this.props.router.query.id
-        axios.post('/api/rate', {value, alias, ownerName: name, ownerId: id})
-    }
+        const id = localStorage.getItem("user");
+        const name = localStorage.getItem("name");
+        const alias = this.props.router.query.id;
+        axios.post("/api/rate", {value, alias, ownerName: name, ownerId: id});
+    };
 
     render() {
+
         return (
             <div className={styles.full_country}>
+
                 <Link href={'/'}>HOME</Link>
                 <br/>
                 ID : {this.state.id}
@@ -150,9 +179,10 @@ class SingleCountry extends React.Component {
                         )
                     })}
                 </ul>
+
             </div>
-        )
+        );
     }
 }
 
-export default withRouter(SingleCountry)
+export default withRouter(SingleCountry);

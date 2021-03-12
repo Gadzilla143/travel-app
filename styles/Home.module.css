@@ -1,24 +1,57 @@
-.homepage {
+.homepage {}
 
-}
+.auth {}
 
-.auth {
-
-}
-
-.main {
-
-}
+.main {}
 
 .header {
-    display: flex;
-    justify-content: flex-end;
+	display: flex;
+	justify-content: flex-end;
 }
 
 .avatar {
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
+	width: 64px;
+	height: 64px;
+	border-radius: 50%;
 }
 
+.country__wrapper {
+	text-align: center;
+	margin: 0 auto;
+	width: 90%;
+	display: flex;
+	align-items: center;
+	justify-content: space-around;
+	flex-direction: row;
+}
 
+.country__info {
+	width: 50%;
+}
+
+.country__raitng {
+	margin: 0 auto;
+}
+
+.flag__img {
+	width: 200px;
+	width: 100px;
+}
+
+.country__name {
+	font-size: 2em;
+}
+
+.country__map {
+	width: 50%;
+}
+
+.country__map__img {
+	width: 25%;
+	height: 25%;
+}
+
+.capital__img {
+	width: 200px;
+	height: 200px;
+}
