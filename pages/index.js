@@ -252,6 +252,7 @@ class Index extends React.Component {
                                                             capitalImg: country.capitalImageUrl,
                                                             capital_description: country.capital_description,
                                                             capital: country.capital,
+                                                            videoUrl:country.videoUrl
                                                         }),
                                                     },
                                                 }}
