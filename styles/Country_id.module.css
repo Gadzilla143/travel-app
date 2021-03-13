@@ -432,13 +432,14 @@
 
 	.capital__attraction_container {
 		position: relative;
+		min-height: 51rem;
 		top: 0;
 		left: 0;
 	}
 
 	.swiper__attraction {
 		width: 90%;
-		height: 70%;
+		height: 61%;
 		position: absolute;
 		margin-left: -7%;
 		margin-top: -8%;
@@ -508,6 +509,37 @@
 	}
 }
 
+@media only screen and (min-width:1280px) {
+
+	.capital__attraction_container {
+		position: relative;
+		top: 0;
+		left: 0;
+		min-height: 56rem;
+	}
+
+	.swiper__attraction {
+		width: 90%;
+		height: 69%;
+		position: absolute;
+		margin-left: -7%;
+		margin-top: -8%;
+		top: 0;
+		left: 0;
+		right: 0;
+		margin: 0 auto;
+	}
+
+	.swiper__info {
+		font-size: 2rem;
+		top: 0%;
+		left: 0%;
+		width: 20%;
+		height: 90%;
+		margin: 0 auto;
+	}
+}
+
 @media only screen and (min-width:1366px) {
 
 	.capital__info_description {
@@ -519,10 +551,9 @@
 		left: 0;
 		top: 0;
 		position: relative;
-		font-size: 1rem;
-		height: auto;
-		/* 		background-color: aqua;
- */
+		height: 62rem;
+		background-color: aqua;
+	
 	}
 
 	.capital__attraction_container {
@@ -533,7 +564,7 @@
 
 	.swiper__attraction {
 		width: 90%;
-		height: 82%;
+		height: 73%;
 		position: absolute;
 		margin-left: -7%;
 		margin-top: -8%;
