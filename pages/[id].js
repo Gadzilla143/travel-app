@@ -136,7 +136,7 @@ class SingleCountry extends React.Component {
 
   render() {
        const opts = {
-      height: 'auto',
+      height: '320',
       width: '100%',
       playerVars: {
         autoplay: 1,
