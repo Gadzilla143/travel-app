@@ -7,8 +7,6 @@ import "swiper/components/effect-cube/effect-cube.scss";
 import Head from "next/head";
 import React from "react";
 
-
-
 export default function App({ Component, pageProps }) {
   return (
     <>
@@ -23,8 +21,7 @@ export default function App({ Component, pageProps }) {
       <main>
         <Component {...pageProps} />
       </main>
-      <footer>footer</footer>
-    </>
+{/*       <footer>footer</footer>
+ */}    </>
   );
-
 }

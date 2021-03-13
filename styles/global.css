@@ -493,17 +493,7 @@ main {}
 
 footer {}
 
-<<<<<<< HEAD
-footer {
-    
-    height: 100px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-=======
 .link__home {
 	text-decoration: none;
 	color: black;
 }
->>>>>>> 3a798dcddf1ae5ab47cd5227622b124aa1556287
