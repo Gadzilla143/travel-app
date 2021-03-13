@@ -240,7 +240,6 @@ class Index extends React.Component {
                     ? "filteredCountries"
                     : "countries"
                 ].map((country, index) => {
-                  console.log(country.capitalImageUrl);
                   return (
                     <div key={index}>
                       <Link

@@ -3,16 +3,6 @@ import axios from "axios";
 import styles from "../styles/Country_id.module.css";
 import Link from "next/link";
 import React from "react";
-import {
-  Player,
-  ControlBar,
-  ReplayControl,
-  ForwardControl,
-  CurrentTimeDisplay,
-  TimeDivider,
-  PlaybackRateMenuButton,
-  VolumeMenuButton,
-} from "video-react";
 import mapboxgl from "mapbox-gl";
 import Rating from "react-rating";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -23,8 +13,7 @@ import SwiperCore, {
   Scrollbar,
   A11y,
 } from "swiper";
-import "video-react/dist/video-react.css";
-import { FullScreen, useFullScreenHandle } from "react-full-screen";
+import YouTube from "react-youtube";
 
 SwiperCore.use([Navigation, Pagination, Scrollbar, A11y, EffectCube]);
 
@@ -145,7 +134,14 @@ class SingleCountry extends React.Component {
   };
 
   render() {
-
+    const opts = {
+      height: "auto",
+      width: "100%",
+      playerVars: {
+        autoplay: 1,
+      },
+    };
+    console.log(parseFloat(this.state.rates.rub).toFixed(2));
     return (
       <div className={styles.full_country}>
         <img
@@ -185,7 +181,7 @@ class SingleCountry extends React.Component {
         <div className={styles.capital__data_wrapper}>
           <div className={styles.capital__attraction_container}>
             <Swiper
-              className={styles.swiper__container_attraction}
+              className={styles.swiper__attraction}
               effect="cube"
               loop={true}
               pagination={{ clickable: true }}
@@ -195,14 +191,15 @@ class SingleCountry extends React.Component {
                   <li key={index}>
                     <SwiperSlide key={index}>
                       {/* <button onClick={handle.enter}>Enter fullscreen</button> */}
-{/*                       <FullScreen >
- */}                        <img
-                          className={styles.swiper__img}
-                          src={attraction.imageUrl}
-                          alt={attraction.imageUrl}
-                        />
-{/*                       </FullScreen>
- */}
+                      {/*                       <FullScreen >
+                       */}{" "}
+                      <img
+                        className={styles.swiper__img}
+                        src={attraction.imageUrl}
+                        alt={attraction.imageUrl}
+                      />
+                      {/*                       </FullScreen>
+                       */}
                       <p className={styles.swiper__attraction_title}>
                         {attraction.title}
                       </p>
@@ -216,63 +213,65 @@ class SingleCountry extends React.Component {
             </Swiper>
           </div>
           <div className={styles.capital__data_container}>
-            <Swiper
-              className={styles.swiper__container_info}
-              effect="cube"
-              loop={true}
-              pagination={{ clickable: true }}
-            >
-              <SwiperSlide className={styles.info__currency}>
-                <div className={styles.info__container}>
-                  <p className={styles.currency__title}>
-                    Валюта страны: {this.state.currency}
-                  </p>
-                  <p className={styles.currency__course}>Курсы валют:</p>
+            <div className={styles.data__container_info}>
+              <Swiper
+                className={styles.swiper__info}
+                effect="cube"
+                loop={true}
+                pagination={{ clickable: true }}
+              >
+                <SwiperSlide className={styles.info__currency}>
+                  <div className={styles.info__container}>
+                    <p className={styles.currency__title}>
+                      Валюта страны: {this.state.currency}
+                    </p>
+                    <p className={styles.currency__course}>Курсы валют:</p>
 
-                  <p className={styles.currency__course}>
-                    USD/EUR
-                    {this.state.rates.usd}
-                  </p>
-                  <p className={styles.currency__course}>
-                    RUB/EUR{this.state.rates.rub}
-                  </p>
-                </div>
-              </SwiperSlide>
+                    <p className={styles.currency__course}>
+                      USD/EUR
+                      {parseFloat(this.state.rates.usd).toFixed(3)}
+                    </p>
+                    <p className={styles.currency__course}>
+                      RUB/EUR{parseFloat(this.state.rates.rub).toFixed(3)}
+                    </p>
+                  </div>
+                </SwiperSlide>
 
-              <SwiperSlide className={styles.info__weather}>
-                <div className={styles.info__container}>
-                  <p className={styles.weather__date_title}>Местное время:</p>
-                  <p className={styles.weather__date}>{this.state.date}</p>
-                  <p className={styles.weather__current_title}>
-                    Текущая погода:
-                  </p>
-                  <p className={styles.weather__current}>
-                    tC = {this.state.temp}
-                  </p>
-                  <p className={styles.weather__current}>
-                    wind {this.state.wind} m/s
-                  </p>
-                </div>
-              </SwiperSlide>
-            </Swiper>
-
-            <Swiper className={styles.swiper__container_map}>
-              <SwiperSlide>
-                <div id={"map"} className={styles.map} />
-              </SwiperSlide>
-            </Swiper>
-
-            <Swiper className={styles.swiper__container_video}>
-              <SwiperSlide>
-                <iframe
-                  src="https://www.youtube.com/watch?v=S_dfq9rFWAE"
-                  frameBorder="0"
-                  allow="autoplay; encrypted-media"
-                  allowFullScreen
-                  title="video"
-                />
-              </SwiperSlide>
-            </Swiper>
+                <SwiperSlide className={styles.info__weather}>
+                  <div className={styles.info__container}>
+                    <p className={styles.weather__date_title}>Местное время:</p>
+                    <p className={styles.weather__date}>{this.state.date}</p>
+                    <p className={styles.weather__current_title}>
+                      Текущая погода:
+                    </p>
+                    <p className={styles.weather__current}>
+                      tC = {this.state.temp}
+                    </p>
+                    <p className={styles.weather__current}>
+                      wind {this.state.wind} m/s
+                    </p>
+                  </div>
+                </SwiperSlide>
+              </Swiper>
+            </div>
+            <div className={styles.data__container_map}>
+              <Swiper className={styles.swiper__map}>
+                <SwiperSlide>
+                  <div id={"map"} className={styles.map} />
+                </SwiperSlide>
+              </Swiper>
+            </div>
+            <div className={styles.data__container_video}>
+              <Swiper className={styles.swiper__video}>
+                <SwiperSlide>
+                  <YouTube
+                    videoId="U8_q60-vs9E"
+                    opts={opts}
+                    onReady={this._onReady}
+                  />
+                </SwiperSlide>
+              </Swiper>
+            </div>
           </div>
         </div>
       </div>

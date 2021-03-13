@@ -21,7 +21,7 @@ export default function App({ Component, pageProps }) {
       <main>
         <Component {...pageProps} />
       </main>
-      <footer>footer</footer>
-    </>
+{/*       <footer>footer</footer>
+ */}    </>
   );
 }
