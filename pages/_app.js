@@ -6,8 +6,10 @@ import "swiper/components/scrollbar/scrollbar.scss";
 import "swiper/components/effect-cube/effect-cube.scss";
 import Head from "next/head";
 import React from "react";
+import {Provider} from 'react-redux';
+import store from "../store/store";
 
-export default function App({ Component, pageProps }) {
+function App({ Component, pageProps }) {
   return (
     <>
       <Head>
@@ -19,9 +21,13 @@ export default function App({ Component, pageProps }) {
         {/*<link rel="icon" href="/favicon.ico"/>*/}
       </Head>
       <main>
+          <Provider store={store}>
         <Component {...pageProps} />
+          </Provider>
       </main>
 {/*       <footer>footer</footer>
  */}    </>
   );
 }
+
+export default App
