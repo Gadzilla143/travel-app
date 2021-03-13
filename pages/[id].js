@@ -33,11 +33,36 @@ class SingleCountry extends React.Component {
     offset: null,
     temp: null,
     wind: null,
+    currencyTitle: null,
+    courseTitle: null,
+    dateTitle: null,
+    weatherTitle: null,
   };
 
   getData = () => {
     const alias = this.props.router.query.id;
-    console.log(alias);
+    if (localStorage.getItem("lang") === "ru") {
+      this.setState({
+        currencyTitle: "Валюта страны: ",
+        courseTitle: "Курсы валют: ",
+        dateTitle: "Местное время:",
+        weatherTitle: "Текущая погода:",
+      });
+    } else if (localStorage.getItem("lang") === "en") {
+      this.setState({
+        currencyTitle: "Country currency: ",
+        courseTitle: "Exchange rates: ",
+        dateTitle: "Local time:",
+        weatherTitle: "Current weather:",
+      });
+    } else {
+      this.setState({
+        currencyTitle: "Landeswährung: ",
+        courseTitle: "Wechselkurse: ",
+        dateTitle: "Die ortszeit:",
+        weatherTitle: "Aktuelles wetter: ",
+      });
+    }
     const {
       currency,
       attractions,
@@ -109,6 +134,8 @@ class SingleCountry extends React.Component {
     const id = localStorage.getItem("user");
     if (id) {
       const user = { id, type: "auto_login" };
+      console.log(localStorage.getItem("lang"));
+
       axios.post("/api/auth", { user }).then((response) => {
         if (!response.data.error) {
           localStorage.setItem("name", response.data.name);
@@ -141,8 +168,8 @@ class SingleCountry extends React.Component {
         autoplay: 1,
       },
     };
-    console.log(parseFloat(this.state.rates.rub).toFixed(2));
-    return (
+    /*     console.log(parseFloat(this.state.rates.rub).toFixed(2));
+     */ return (
       <div className={styles.full_country}>
         <img
           className={styles.capital__img}
@@ -161,16 +188,17 @@ class SingleCountry extends React.Component {
               {this.state.capital_description}
             </p>
           </div>
-          RATE:
+          {/*            RATE:
+           */}{" "}
           {this.state.isAuth ? (
             <Rating onChange={(value) => this.Rate(value)} />
           ) : null}
-          RECENT RATING:
+          <p className={styles.rating__title}>RECENT RATING:</p>
           <ul>
             {this.state.rating.map((el) => {
               return Object.values(el).map((value) => {
                 return (
-                  <li key={value.ownerName}>
+                  <li className={styles.rating__users}  key={value.ownerName}>
                     Owner:{value.ownerName} Rate : {value.value}
                   </li>
                 );
@@ -190,16 +218,11 @@ class SingleCountry extends React.Component {
                 return (
                   <li key={index}>
                     <SwiperSlide key={index}>
-                      {/* <button onClick={handle.enter}>Enter fullscreen</button> */}
-                      {/*                       <FullScreen >
-                       */}{" "}
                       <img
                         className={styles.swiper__img}
                         src={attraction.imageUrl}
                         alt={attraction.imageUrl}
                       />
-                      {/*                       </FullScreen>
-                       */}
                       <p className={styles.swiper__attraction_title}>
                         {attraction.title}
                       </p>
@@ -223,26 +246,30 @@ class SingleCountry extends React.Component {
                 <SwiperSlide className={styles.info__currency}>
                   <div className={styles.info__container}>
                     <p className={styles.currency__title}>
-                      Валюта страны: {this.state.currency}
+                      {this.state.currencyTitle} {this.state.currency}
                     </p>
-                    <p className={styles.currency__course}>Курсы валют:</p>
+                    <p className={styles.currency__course}>
+                      {this.state.courseTitle}
+                    </p>
 
                     <p className={styles.currency__course}>
-                      USD/EUR
+                      USD/EUR:
                       {parseFloat(this.state.rates.usd).toFixed(3)}
                     </p>
                     <p className={styles.currency__course}>
-                      RUB/EUR{parseFloat(this.state.rates.rub).toFixed(3)}
+                      RUB/EUR: {parseFloat(this.state.rates.rub).toFixed(3)}
                     </p>
                   </div>
                 </SwiperSlide>
 
                 <SwiperSlide className={styles.info__weather}>
                   <div className={styles.info__container}>
-                    <p className={styles.weather__date_title}>Местное время:</p>
+                    <p className={styles.weather__date_title}>
+                      {this.state.dateTitle}
+                    </p>
                     <p className={styles.weather__date}>{this.state.date}</p>
                     <p className={styles.weather__current_title}>
-                      Текущая погода:
+                      {this.state.weatherTitle}
                     </p>
                     <p className={styles.weather__current}>
                       tC = {this.state.temp}
@@ -254,6 +281,7 @@ class SingleCountry extends React.Component {
                 </SwiperSlide>
               </Swiper>
             </div>
+
             <div className={styles.data__container_map}>
               <Swiper className={styles.swiper__map}>
                 <SwiperSlide>
@@ -261,6 +289,7 @@ class SingleCountry extends React.Component {
                 </SwiperSlide>
               </Swiper>
             </div>
+
             <div className={styles.data__container_video}>
               <Swiper className={styles.swiper__video}>
                 <SwiperSlide>
