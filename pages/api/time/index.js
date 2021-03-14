@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export default async (req, res) => {
-    const {alias} = req.body
-    const response = await axios.get(`http://worldtimeapi.org/api/timezone/Europe/${alias}.json`)
-    res.json({data: response.data.utc_datetime,offset:response.data.utc_offset})
+    const {lon,lat} = req.body
+    const response = await axios.get(`http://api.timezonedb.com/v2.1/get-time-zone?key=836L9RXMDBSI&format=json&by=position&lat=${lat}&lng=${lon}`)
+    res.json({data: response.data.formatted})
 }

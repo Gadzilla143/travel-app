@@ -1,4 +1,3 @@
-import { withRouter } from "next/router";
 import axios from "axios";
 import styles from "../styles/Country_id.module.css";
 import Link from "next/link";
@@ -7,13 +6,16 @@ import mapboxgl from "mapbox-gl";
 import Rating from "react-rating";
 import { Swiper, SwiperSlide } from "swiper/react";
 import SwiperCore, {
+  A11y,
   EffectCube,
   Navigation,
   Pagination,
   Scrollbar,
-  A11y,
 } from "swiper";
 import YouTube from "react-youtube";
+import { connect } from "react-redux";
+import { withRouter } from "next/router";
+import { fetchAll } from "../store/actions";
 
 SwiperCore.use([Navigation, Pagination, Scrollbar, A11y, EffectCube]);
 
@@ -27,6 +29,7 @@ class SingleCountry extends React.Component {
     currency: null,
     attractions: [],
     rating: [],
+    videoUrl: null,
     isAuth: false,
     rates: {},
     date: null,
@@ -40,7 +43,9 @@ class SingleCountry extends React.Component {
   };
 
   getData = () => {
-    const alias = this.props.router.query.id;
+    const id = this.props.router.query.id;
+	 const city = this.props.countries.find((el) => el.capital_alias === id);
+	 
     if (localStorage.getItem("lang") === "ru") {
       this.setState({
         currencyTitle: "Валюта страны: ",
@@ -63,79 +68,79 @@ class SingleCountry extends React.Component {
         weatherTitle: "Aktuelles wetter: ",
       });
     }
-    const {
-      currency,
-      attractions,
-      rating,
-      capitalImg,
-      capital_description,
-      capital,
-    } = JSON.parse(this.props.router.query.data);
 
     this.setState({
-      id: this.props.router.query.id,
-      currency,
-      attractions,
-      rating,
-      capitalImg,
-      capital_description,
-      capital,
-    });
+      id,
+      currency: city.local_currency,
+      attractions: city.attractions,
+      rating: city.rating,
+      capitalImg: city.capitalImageUrl,
+      capital_description: city.capital_description,
+      capital: city.capital,
+      videoUrl: city.videoUrl.slice(-11),
+	 });
+
     // CURRENCY
-    axios.post("/api/currency", { currency }).then((response) => {
-      if (!response.data.error) {
-        this.setState({ rates: response.data.data });
-      }
-    });
-    // TIME
-    axios.post("/api/time", { alias }).then((response) => {
-      if (!response.data.error) {
-        const date = Date.parse(response.data.data);
-        const options = {
-          year: "numeric",
-          month: "numeric",
-          day: "numeric",
-          hour: "numeric",
-          minute: "numeric",
-          second: "numeric",
-          hour12: false,
-        };
-        options.timeZone = "UTC";
-        options.timeZoneName = "short";
-        this.setState({
-          date: new Intl.DateTimeFormat("en-AU", options).format(date),
-          offset: response.data.offset,
-        });
-      }
-    });
+    axios
+      .post("/api/currency", { currency: city.local_currency })
+      .then((response) => {
+        if (!response.data.error) {
+          this.setState({ rates: response.data.data });
+        }
+      });
     // WEATHER
-    axios.post("/api/weather", { alias }).then((response) => {
-      if (!response.data.error) {
-        this.setState({
-          temp: response.data.data.temp,
-          wind: response.data.data.wind,
-        });
-        mapboxgl.accessToken =
-          "pk.eyJ1Ijoic2xhdmFpZGVyIiwiYSI6ImNrbHhxY20xNDF2bDEyb3Azc2h6M3gydW4ifQ.lIJ0H5bCqxE7JmW892Hc6g";
-        new mapboxgl.Map({
-          container: "map",
-          style: "mapbox://styles/mapbox/streets-v11",
-          center: [response.data.data.cords.lon, response.data.data.cords.lat], // starting position [lng, lat]
-          zoom: 9, // starting zoom
-        });
-      }
-    });
+    axios
+      .post("/api/weather", { alias: city.capital_alias })
+      .then((response) => {
+        if (!response.data.error) {
+          this.setState({
+            temp: response.data.data.temp,
+            wind: response.data.data.wind,
+          });
+          mapboxgl.accessToken =
+            "pk.eyJ1Ijoic2xhdmFpZGVyIiwiYSI6ImNrbHhxY20xNDF2bDEyb3Azc2h6M3gydW4ifQ.lIJ0H5bCqxE7JmW892Hc6g";
+          new mapboxgl.Map({
+            container: "map",
+            style: "mapbox://styles/mapbox/streets-v11",
+            center: [
+              response.data.data.cords.lon,
+              response.data.data.cords.lat,
+            ], // starting position [lng, lat]
+            zoom: 9, // starting zoom
+          });
+
+          // TIME
+          axios
+            .post("/api/time", {
+              lon: response.data.data.cords.lon,
+              lat: response.data.data.cords.lat,
+            })
+            .then((response) => {
+              if (!response.data.error) {
+                this.setState({
+                  date: response.data.data,
+                });
+              }
+            });
+        }
+      });
   };
 
   componentDidMount() {
-    if (this.props.router.query.data) {
+    if (this.props.countries.length === 0) {
+      axios
+        .post("/api/country", {
+          type: localStorage.getItem("lang") || "ru",
+        })
+        .then((response) => {
+          this.props.fetchAll(response.data.data);
+        });
+    } else {
       this.getData();
     }
     const id = localStorage.getItem("user");
     if (id) {
       const user = { id, type: "auto_login" };
-      console.log(localStorage.getItem("lang"));
-
       axios.post("/api/auth", { user }).then((response) => {
         if (!response.data.error) {
           localStorage.setItem("name", response.data.name);
@@ -148,9 +153,10 @@ class SingleCountry extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    if (prevProps !== this.props) {
-      this.getData();
+    if (prevProps.countries !== this.props.countries) {
+      if (this.props.countries.length !== 0) this.getData();
     }
+
   }
 
   Rate = (value) => {
@@ -159,7 +165,7 @@ class SingleCountry extends React.Component {
     const alias = this.props.router.query.id;
     axios.post("/api/rate", { value, alias, ownerName: name, ownerId: id });
   };
-
+ 
   render() {
     const opts = {
       height: "260",
@@ -168,8 +174,7 @@ class SingleCountry extends React.Component {
         autoplay: 1,
       },
     };
-    /*     console.log(parseFloat(this.state.rates.rub).toFixed(2));
-     */ return (
+    return (
       <div className={styles.full_country}>
         <img
           className={styles.capital__img}
@@ -188,8 +193,7 @@ class SingleCountry extends React.Component {
               {this.state.capital_description}
             </p>
           </div>
-          {/*            RATE:
-           */}{" "}
+
           {this.state.isAuth ? (
             <Rating onChange={(value) => this.Rate(value)} />
           ) : null}
@@ -198,7 +202,7 @@ class SingleCountry extends React.Component {
             {this.state.rating.map((el) => {
               return Object.values(el).map((value) => {
                 return (
-                  <li className={styles.rating__users}  key={value.ownerName}>
+                  <li className={styles.rating__users} key={value.ownerName}>
                     Owner:{value.ownerName} Rate : {value.value}
                   </li>
                 );
@@ -294,7 +298,7 @@ class SingleCountry extends React.Component {
               <Swiper className={styles.swiper__video}>
                 <SwiperSlide>
                   <YouTube
-                    videoId="U8_q60-vs9E"
+                    videoId={this.state.videoUrl}
                     opts={opts}
                     onReady={this._onReady}
                   />
@@ -308,4 +312,19 @@ class SingleCountry extends React.Component {
   }
 }
 
-export default withRouter(SingleCountry);
+function mapStateToProps(state) {
+  return {
+    countries: state.countries.countries,
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    fetchAll: (data) => dispatch(fetchAll(data)),
+  };
+}
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withRouter(SingleCountry));
