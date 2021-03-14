@@ -16,6 +16,9 @@ import YouTube from "react-youtube";
 import { connect } from "react-redux";
 import { withRouter } from "next/router";
 import { fetchAll } from "../store/actions";
+import ModalMap from "./ModalMap";
+import HomeIcon from "@material-ui/icons/Home";
+import FullscreenIcon from "@material-ui/icons/Fullscreen";
 
 SwiperCore.use([Navigation, Pagination, Scrollbar, A11y, EffectCube]);
 
@@ -40,12 +43,15 @@ class SingleCountry extends React.Component {
     courseTitle: null,
     dateTitle: null,
     weatherTitle: null,
+    modalMap: false,
+    lon: null,
+    lat: null,
   };
 
   getData = () => {
     const id = this.props.router.query.id;
-	 const city = this.props.countries.find((el) => el.capital_alias === id);
-	 
+    const city = this.props.countries.find((el) => el.capital_alias === id);
+
     if (localStorage.getItem("lang") === "ru") {
       this.setState({
         currencyTitle: "Валюта страны: ",
@@ -78,7 +84,7 @@ class SingleCountry extends React.Component {
       capital_description: city.capital_description,
       capital: city.capital,
       videoUrl: city.videoUrl.slice(-11),
-	 });
+    });
 
     // CURRENCY
     axios
@@ -96,6 +102,8 @@ class SingleCountry extends React.Component {
           this.setState({
             temp: response.data.data.temp,
             wind: response.data.data.wind,
+            lon: response.data.data.cords.lon,
+            lat: response.data.data.cords.lat,
           });
           mapboxgl.accessToken =
             "pk.eyJ1Ijoic2xhdmFpZGVyIiwiYSI6ImNrbHhxY20xNDF2bDEyb3Azc2h6M3gydW4ifQ.lIJ0H5bCqxE7JmW892Hc6g";
@@ -156,7 +164,6 @@ class SingleCountry extends React.Component {
     if (prevProps.countries !== this.props.countries) {
       if (this.props.countries.length !== 0) this.getData();
     }
-
   }
 
   Rate = (value) => {
@@ -165,8 +172,10 @@ class SingleCountry extends React.Component {
     const alias = this.props.router.query.id;
     axios.post("/api/rate", { value, alias, ownerName: name, ownerId: id });
   };
- 
+
   render() {
+    //console.log(this.state.lon);
+
     const opts = {
       height: "260",
       width: "100%",
@@ -175,139 +184,159 @@ class SingleCountry extends React.Component {
       },
     };
     return (
-      <div className={styles.full_country}>
-        <img
-          className={styles.capital__img}
-          src={this.state.capitalImg}
-          alt={this.state.capitalImg}
-        />
-        <div className={styles.capital__info_wrapper}>
-          <div className={styles.link__home}>
-            <Link className="link__home" style={{ color: "red" }} href={"/"}>
-              HOME
-            </Link>
-          </div>
-          <div className={styles.capital__info}>
-            <p className={styles.capital__info_name}>{this.state.capital}</p>
-            <p className={styles.capital__info_description}>
-              {this.state.capital_description}
-            </p>
-          </div>
+      <>
+        <div className={styles.full_country}>
+          <img
+            className={styles.capital__img}
+            src={this.state.capitalImg}
+            alt={this.state.capitalImg}
+          />
+          <div className={styles.capital__info_wrapper}>
+            <div className={styles.link__home}>
+              <Link className={styles.link__home} href={"/"}>
+                <HomeIcon fontSize="large" className={styles.home__btn} />
+              </Link>
+            </div>
+            <div className={styles.capital__info}>
+              <p className={styles.capital__info_name}>{this.state.capital}</p>
+              <p className={styles.capital__info_description}>
+                {this.state.capital_description}
+              </p>
+            </div>
 
-          {this.state.isAuth ? (
-            <Rating onChange={(value) => this.Rate(value)} />
-          ) : null}
-          <p className={styles.rating__title}>RECENT RATING:</p>
-          <ul>
-            {this.state.rating.map((el) => {
-              return Object.values(el).map((value) => {
-                return (
-                  <li className={styles.rating__users} key={value.ownerName}>
-                    Owner:{value.ownerName} Rate : {value.value}
-                  </li>
-                );
-              });
-            })}
-          </ul>
-        </div>
-        <div className={styles.capital__data_wrapper}>
-          <div className={styles.capital__attraction_container}>
-            <Swiper
-              className={styles.swiper__attraction}
-              effect="cube"
-              loop={true}
-              pagination={{ clickable: true }}
-            >
-              {this.state.attractions.map((attraction, index) => {
-                return (
-                  <li key={index}>
-                    <SwiperSlide key={index}>
-                      <img
-                        className={styles.swiper__img}
-                        src={attraction.imageUrl}
-                        alt={attraction.imageUrl}
-                      />
-                      <p className={styles.swiper__attraction_title}>
-                        {attraction.title}
-                      </p>
-                      <p className={styles.swiper__attraction_description}>
-                        {attraction.description}
-                      </p>
-                    </SwiperSlide>
-                  </li>
-                );
+            {this.state.isAuth ? (
+              <Rating onChange={(value) => this.Rate(value)} />
+            ) : null}
+            <p className={styles.rating__title}>RECENT RATING:</p>
+            <ul>
+              {this.state.rating.map((el) => {
+                return Object.values(el).map((value) => {
+                  return (
+                    <li className={styles.rating__users} key={value.ownerName}>
+                      Owner:{value.ownerName} Rate : {value.value}
+                    </li>
+                  );
+                });
               })}
-            </Swiper>
+            </ul>
           </div>
-          <div className={styles.capital__data_container}>
-            <div className={styles.data__container_info}>
+          <div className={styles.capital__data_wrapper}>
+            <div className={styles.capital__attraction_container}>
+              <button
+                className="btn__modal"
+                onClick={() => this.setState({ modalMap: true })}
+              >
+                <FullscreenIcon fontSize="large"></FullscreenIcon>
+              </button>
               <Swiper
-                className={styles.swiper__info}
+                className={styles.swiper__attraction}
                 effect="cube"
                 loop={true}
                 pagination={{ clickable: true }}
               >
-                <SwiperSlide className={styles.info__currency}>
-                  <div className={styles.info__container}>
-                    <p className={styles.currency__title}>
-                      {this.state.currencyTitle} {this.state.currency}
-                    </p>
-                    <p className={styles.currency__course}>
-                      {this.state.courseTitle}
-                    </p>
-
-                    <p className={styles.currency__course}>
-                      USD/EUR:
-                      {parseFloat(this.state.rates.usd).toFixed(3)}
-                    </p>
-                    <p className={styles.currency__course}>
-                      RUB/EUR: {parseFloat(this.state.rates.rub).toFixed(3)}
-                    </p>
-                  </div>
-                </SwiperSlide>
-
-                <SwiperSlide className={styles.info__weather}>
-                  <div className={styles.info__container}>
-                    <p className={styles.weather__date_title}>
-                      {this.state.dateTitle}
-                    </p>
-                    <p className={styles.weather__date}>{this.state.date}</p>
-                    <p className={styles.weather__current_title}>
-                      {this.state.weatherTitle}
-                    </p>
-                    <p className={styles.weather__current}>
-                      tC = {this.state.temp}
-                    </p>
-                    <p className={styles.weather__current}>
-                      wind {this.state.wind} m/s
-                    </p>
-                  </div>
-                </SwiperSlide>
+                {this.state.attractions.map((attraction, index) => {
+                  return (
+                    <li key={index}>
+                      <SwiperSlide key={index}>
+                        <img
+                          className={styles.swiper__img}
+                          src={attraction.imageUrl}
+                          alt={attraction.imageUrl}
+                        />
+                        <p className={styles.swiper__attraction_title}>
+                          {attraction.title}
+                        </p>
+                        <p className={styles.swiper__attraction_description}>
+                          {attraction.description}
+                        </p>
+                      </SwiperSlide>
+                    </li>
+                  );
+                })}
               </Swiper>
             </div>
+            <div className={styles.capital__data_container}>
+              <div className={styles.data__container_info}>
+                <Swiper
+                  className={styles.swiper__info}
+                  effect="cube"
+                  loop={true}
+                  pagination={{ clickable: true }}
+                >
+                  <SwiperSlide className={styles.info__currency}>
+                    <div className={styles.info__container}>
+                      <p className={styles.currency__title}>
+                        {this.state.currencyTitle} {this.state.currency}
+                      </p>
+                      <p className={styles.currency__course}>
+                        {this.state.courseTitle}
+                      </p>
 
-            <div className={styles.data__container_map}>
-              <Swiper className={styles.swiper__map}>
-                <SwiperSlide>
-                  <div id={"map"} className={styles.map} />
-                </SwiperSlide>
-              </Swiper>
-            </div>
+                      <p className={styles.currency__course}>
+                        USD/EUR:
+                        {parseFloat(this.state.rates.usd).toFixed(3)}
+                      </p>
+                      <p className={styles.currency__course}>
+                        RUB/EUR: {parseFloat(this.state.rates.rub).toFixed(3)}
+                      </p>
+                    </div>
+                  </SwiperSlide>
 
-            <div className={styles.data__container_video}>
-              <Swiper className={styles.swiper__video}>
-                <SwiperSlide>
-                  <YouTube
-                    videoId={this.state.videoUrl}
-                    opts={opts}
-                    onReady={this._onReady}
-                  />
-                </SwiperSlide>
-              </Swiper>
+                  <SwiperSlide className={styles.info__weather}>
+                    <div className={styles.info__container}>
+                      <p className={styles.weather__date_title}>
+                        {this.state.dateTitle}
+                      </p>
+                      <p className={styles.weather__date}>{this.state.date}</p>
+                      <p className={styles.weather__current_title}>
+                        {this.state.weatherTitle}
+                      </p>
+                      <p className={styles.weather__current}>
+                        tC = {this.state.temp}
+                      </p>
+                      <p className={styles.weather__current}>
+                        wind {this.state.wind} m/s
+                      </p>
+                    </div>
+                  </SwiperSlide>
+                </Swiper>
+              </div>
+
+              <div className={styles.data__container_map}>
+                <button
+                  className="btn__modal"
+                  onClick={() => this.setState({ modalMap: true })}
+                >
+                  <FullscreenIcon fontSize="large"></FullscreenIcon>
+                </button>
+                <Swiper className={styles.swiper__map}>
+                  <SwiperSlide>
+                    <div id={"map"} className={styles.map} />
+                  </SwiperSlide>
+                </Swiper>
+              </div>
+
+              <div className={styles.data__container_video}>
+                <Swiper className={styles.swiper__video}>
+                  <SwiperSlide>
+                    <YouTube
+                      videoId={this.state.videoUrl}
+                      opts={opts}
+                      onReady={this._onReady}
+                    />
+                  </SwiperSlide>
+                </Swiper>
+              </div>
             </div>
           </div>
+          <ModalMap
+            mapLon={this.state.lon}
+            mapLat={this.state.lat}
+            isOpened={this.state.modalMap}
+            onModalClose={() => this.setState({ modalMap: false })}
+          />
         </div>
-      </div>
+      </>
     );
   }
 }
