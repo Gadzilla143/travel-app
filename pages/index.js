@@ -51,6 +51,7 @@ class Index extends React.Component {
                     });
                 }
             });
+            document.getElementById('search').focus()
         }
     }
 
@@ -96,16 +97,14 @@ class Index extends React.Component {
     };
 
     searchText = (e) => {
-        if (e.key === "Enter") {
-            if (e.target.value === "") this.setState({filteredCountries: null});
-            const filter = [...this.state.countries];
-            const result = filter.filter((el) => {
-                return (
-                    el.name.toLowerCase().indexOf(e.target.value.toLowerCase()) !== -1
-                );
-            });
-            this.setState({filteredCountries: result});
-        }
+        if (e.target.value === "") this.setState({filteredCountries: null});
+        const filter = [...this.state.countries];
+        const result = filter.filter((el) => {
+            return (
+                el.name.toLowerCase().indexOf(e.target.value.toLowerCase()) !== -1
+            );
+        });
+        this.setState({filteredCountries: result});
     };
     searchButton = () => {
         const value = document.querySelector("#search").value;
@@ -146,6 +145,11 @@ class Index extends React.Component {
         return (res / rating.length).toFixed(1);
     };
 
+    clear = () => {
+        document.getElementById('search').value = ''
+        this.setState({filteredCountries: null})
+    }
+
     render() {
         return (
             <div className={styles.homepage}>
@@ -164,9 +168,11 @@ class Index extends React.Component {
                     <input
                         type="text"
                         id={"search"}
-                        onKeyDown={(e) => this.searchText(e)}
+                        onInput={(e) => this.searchText(e)}
                         placeholder={"Search"}
                     />
+                    <button className="clear"
+                            onClick={() => this.clear()}>&times;</button>
                     <button onClick={() => this.searchButton()}>Search</button>
                     {!this.state.isAuth ? (
                         <div className={styles.auth}>
