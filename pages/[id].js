@@ -4,14 +4,8 @@ import Link from "next/link";
 import React from "react";
 import mapboxgl from "mapbox-gl";
 import Rating from "react-rating";
-import { Swiper, SwiperSlide } from "swiper/react";
-import SwiperCore, {
-  A11y,
-  EffectCube,
-  Navigation,
-  Pagination,
-  Scrollbar,
-} from "swiper";
+import {Swiper, SwiperSlide} from "swiper/react";
+import SwiperCore, {A11y, EffectCube, Navigation, Pagination, Scrollbar,} from "swiper";
 import YouTube from "react-youtube";
 import { connect } from "react-redux";
 import { withRouter } from "next/router";
@@ -86,85 +80,88 @@ class SingleCountry extends React.Component {
       videoUrl: city.videoUrl.slice(-11),
     });
 
-    // CURRENCY
-    axios
-      .post("/api/currency", { currency: city.local_currency })
-      .then((response) => {
-        if (!response.data.error) {
-          this.setState({ rates: response.data.data });
-        }
-      });
-    // WEATHER
-    axios
-      .post("/api/weather", { alias: city.capital_alias })
-      .then((response) => {
-        if (!response.data.error) {
-          this.setState({
-            temp: response.data.data.temp,
-            wind: response.data.data.wind,
-            lon: response.data.data.cords.lon,
-            lat: response.data.data.cords.lat,
-          });
-          mapboxgl.accessToken =
-            "pk.eyJ1Ijoic2xhdmFpZGVyIiwiYSI6ImNrbHhxY20xNDF2bDEyb3Azc2h6M3gydW4ifQ.lIJ0H5bCqxE7JmW892Hc6g";
-          new mapboxgl.Map({
-            container: "map",
-            style: "mapbox://styles/mapbox/streets-v11",
-            center: [
-              response.data.data.cords.lon,
-              response.data.data.cords.lat,
-            ], // starting position [lng, lat]
-            zoom: 9, // starting zoom
-          });
-
-          // TIME
-          axios
-            .post("/api/time", {
-              lon: response.data.data.cords.lon,
-              lat: response.data.data.cords.lat,
-            })
+            // CURRENCY
+        axios
+            .post("/api/currency", {currency: city.local_currency})
             .then((response) => {
-              if (!response.data.error) {
-                this.setState({
-                  date: response.data.data,
+                if (!response.data.error) {
+                    this.setState({rates: response.data.data});
+                }
+            });
+        // WEATHER
+        axios
+            .post("/api/weather", {alias: city.capital_alias})
+            .then((response) => {
+                if (!response.data.error) {
+                    this.setState({
+                        temp: response.data.data.temp,
+                        wind: response.data.data.wind,
+                    });
+                    mapboxgl.accessToken =
+                        "pk.eyJ1Ijoic2xhdmFpZGVyIiwiYSI6ImNrbHhxY20xNDF2bDEyb3Azc2h6M3gydW4ifQ.lIJ0H5bCqxE7JmW892Hc6g";
+                    const map = new mapboxgl.Map({
+                        container: "map",
+                        style: "mapbox://styles/mapbox/streets-v11",
+                        center: [
+                            response.data.data.cords.lon,
+                            response.data.data.cords.lat,
+                        ], // starting position [lng, lat]
+                        zoom: 9, // starting zoom
+                    });
+                    new mapboxgl.Marker()
+                        .setLngLat([response.data.data.cords.lon, response.data.data.cords.lat])
+                        .addTo(map);
+
+                    // TIME
+                    axios
+                        .post("/api/time", {
+                            lon: response.data.data.cords.lon,
+                            lat: response.data.data.cords.lat,
+                        })
+                        .then((response) => {
+                            if (!response.data.error) {
+                                this.setState({
+                                    date: response.data.data,
+                                });
+                            }
+                        });
+                }
+            });
+    };
+
+    componentDidMount() {
+        if (this.props.countries.length === 0) {
+            axios
+                .post("/api/country", {
+                    type: localStorage.getItem("lang") || "ru",
+                })
+                .then((response) => {
+                    this.props.fetchAll(response.data.data);
                 });
-              }
+        } else {
+            this.getData();
+        }
+        const id = localStorage.getItem("user");
+        if (id) {
+            const user = {id, type: "auto_login"};
+            axios.post("/api/auth", {user}).then((response) => {
+                if (!response.data.error) {
+                    localStorage.setItem("name", response.data.name);
+                    localStorage.setItem("avatar", response.data.imageUrl);
+                    localStorage.setItem("user", response.data.id);
+                    this.setState({isAuth: true});
+                }
             });
         }
-      });
-  };
-
-  componentDidMount() {
-    if (this.props.countries.length === 0) {
-      axios
-        .post("/api/country", {
-          type: localStorage.getItem("lang") || "ru",
-        })
-        .then((response) => {
-          this.props.fetchAll(response.data.data);
-        });
-    } else {
-      this.getData();
     }
-    const id = localStorage.getItem("user");
-    if (id) {
-      const user = { id, type: "auto_login" };
-      axios.post("/api/auth", { user }).then((response) => {
-        if (!response.data.error) {
-          localStorage.setItem("name", response.data.name);
-          localStorage.setItem("avatar", response.data.imageUrl);
-          localStorage.setItem("user", response.data.id);
-          this.setState({ isAuth: true });
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (prevProps.countries !== this.props.countries) {
+            if (this.props.countries.length !== 0) this.getData();
         }
-      });
-    }
-  }
 
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    if (prevProps.countries !== this.props.countries) {
-      if (this.props.countries.length !== 0) this.getData();
     }
-  }
+  
 
   Rate = (value) => {
     const id = localStorage.getItem("user");
@@ -337,23 +334,23 @@ class SingleCountry extends React.Component {
           />
         </div>
       </>
-    );
+  );
   }
 }
 
 function mapStateToProps(state) {
-  return {
-    countries: state.countries.countries,
-  };
+    return {
+        countries: state.countries.countries,
+    };
 }
 
 function mapDispatchToProps(dispatch) {
-  return {
-    fetchAll: (data) => dispatch(fetchAll(data)),
-  };
+    return {
+        fetchAll: (data) => dispatch(fetchAll(data)),
+    };
 }
 
 export default connect(
-  mapStateToProps,
-  mapDispatchToProps
+    mapStateToProps,
+    mapDispatchToProps
 )(withRouter(SingleCountry));
