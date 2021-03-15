@@ -9,21 +9,35 @@ class ModalMap extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      zoom: 10,
+      lng: this.props.mapLon,
+      lat: this.props.mapLat,
+      zoom: 11,
     };
     this.mapContainer = React.createRef();
   }
   componentDidMount() {
-    const { zoom } = this.state;
+    this.getMap();
+  }
+
+  getMap() {
+    const { lng, lat, zoom } = this.state;
     const map = new mapboxgl.Map({
       container: this.mapContainer.current,
       style: "mapbox://styles/mapbox/streets-v11",
-      center: [this.props.mapLon, this.props.mapLat],
+      center: [lng, lat],
       zoom: zoom,
     });
   }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (prevProps !== this.props) {
+      this.setState({ lng: this.props.mapLon });
+      this.setState({ lat: this.props.mapLat });
+      this.getMap();
+    }
+  }
+
   render() {
-    console.log(this.props);
     return (
       <>
         <div
@@ -42,27 +56,4 @@ class ModalMap extends Component {
   }
 }
 
-/* 
-const ModalMap = (props) => {
-
-  console.log(props.mapLon, props.mapLat);
-
-  return (
-    <div
-      className={`modal_wrapper ${props.isOpened ? "open" : "close"}`}
-      style={{ ...props.style }}
-    >
-      <div className="modal_body" onClick={(e) => e.stopPropagation}>
-        <div className="modal_close" onClick={props.onModalClose}>
-          X
-        </div>
-        <h2>Карта города {props.title}</h2>
-        <div className="map" ref={mapContainer} />
-      </div>
-    </div>
-  );
-};
-
-export default ModalMap;
- */
 export default ModalMap;
