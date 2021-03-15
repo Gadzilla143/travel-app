@@ -16,33 +16,36 @@ const ModalSlider = (props) => {
   };
   //console.log(props.attractions);
   return (
-    <div
-      className={`modal__slider__wrapper ${props.isOpened ? "open" : "close"}`}
-      style={{ ...props.style }}
-    >
-      <div className={styles.modal__body} onClick={(e) => e.stopPropagation}>
-        <div className={styles.modal__close} onClick={props.onModalClose}>
-          <CancelIcon style={{ fontSize: 40 }} ></CancelIcon>
-        </div>
-        <div className={styles.modal__slider__container}>
-          <Slider {...settings} className={styles.modal__slider__attraction}>
-            {props.attractions.map((attraction, index) => {
-              //console.log(attraction);
-              return (
-                <li key={index}>
-                  <img
-                    className={styles.modal__slider__img}
-                    src={attraction.imageUrl}
-                    alt={attraction.imageUrl}
-                  />
-                </li>
-              );
-            })}
-          </Slider>
+    <>
+      <div
+        className={`html modal__slider__wrapper ${
+          props.isOpened ? "open" : "close"
+        }` }
+        style={{ ...props.style }}
+      >
+        <div className={styles.modal__body} onClick={(e) => e.stopPropagation}>
+          <div className={styles.modal__close} onClick={props.onModalClose}>
+            <CancelIcon style={{ fontSize: 40 }}></CancelIcon>
+          </div>
+          <div className={styles.modal__slider__container}>
+            <Slider {...settings} className={styles.modal__slider__attraction}>
+              {props.attractions.map((attraction, index) => {
+                //console.log(attraction);
+                return (
+                  <li key={index}>
+                    <img
+                      className={styles.modal__slider__img}
+                      src={attraction.imageUrl}
+                      alt={attraction.imageUrl}
+                    />
+                  </li>
+                );
+              })}
+            </Slider>
+          </div>
         </div>
       </div>
-      {/*  */}
-    </div>
+    </>
   );
 };
 export default ModalSlider;
