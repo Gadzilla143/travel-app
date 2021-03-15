@@ -28,6 +28,7 @@ class ModalMap extends Component {
       center: [lng, lat],
       zoom: zoom,
     });
+    new mapboxgl.Marker().setLngLat([lng, lat]).addTo(map);
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {

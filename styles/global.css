@@ -376,7 +376,15 @@ html {
 
 @import "~slick-carousel/slick/slick-theme.css";
 @import "~slick-carousel/slick/slick.css";
-.modal__map__wrapper.open, .modal__slider__wrapper {
+html.modal__map__wrapper.open {
+	overflow: hidden;
+}
+
+html.modal__map__wrapper.close {
+	overflow: visible;
+}
+
+.modal__map__wrapper.open, .modal__slider__wrapper.open {
 	position: fixed;
 	top: 0;
 	background: rgba(0, 0, 0, 0.2);
