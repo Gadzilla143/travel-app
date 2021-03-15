@@ -229,7 +229,7 @@ class SingleCountry extends React.Component {
           <div className={styles.capital__data_wrapper}>
             <div className={styles.capital__attraction_container}>
               <button
-                className="btn__modal_attraction"
+                className={styles.btn__modal_attraction}
                 onClick={() => this.setState({ modalSlider: true })}
               >
                 <ZoomOutMapIcon style={{ fontSize: 30 }}></ZoomOutMapIcon>
@@ -310,8 +310,8 @@ class SingleCountry extends React.Component {
 
               <div className={styles.data__container_map}>
                 <button
-                  className="btn__modal_map"
-                  onClick={() => this.setState({ modalSlider: true })}
+                  className={styles.btn__modal_map}
+                  onClick={() => this.setState({ modalMap: true })}
                 >
                   <ZoomOutMapIcon style={{ fontSize: 40 }}></ZoomOutMapIcon>
                 </button>
