@@ -4,15 +4,22 @@ import Link from "next/link";
 import React from "react";
 import mapboxgl from "mapbox-gl";
 import Rating from "react-rating";
-import {Swiper, SwiperSlide} from "swiper/react";
-import SwiperCore, {A11y, EffectCube, Navigation, Pagination, Scrollbar,} from "swiper";
+import { Swiper, SwiperSlide } from "swiper/react";
+import SwiperCore, {
+  A11y,
+  EffectCube,
+  Navigation,
+  Pagination,
+  Scrollbar,
+} from "swiper";
 import YouTube from "react-youtube";
 import { connect } from "react-redux";
 import { withRouter } from "next/router";
 import { fetchAll } from "../store/actions";
 import ModalMap from "./ModalMap";
+import ModalSlider from "./ModalSlider";
 import HomeIcon from "@material-ui/icons/Home";
-import FullscreenIcon from "@material-ui/icons/Fullscreen";
+import ZoomOutMapIcon from "@material-ui/icons/ZoomOutMap";
 
 SwiperCore.use([Navigation, Pagination, Scrollbar, A11y, EffectCube]);
 
@@ -38,6 +45,7 @@ class SingleCountry extends React.Component {
     dateTitle: null,
     weatherTitle: null,
     modalMap: false,
+    modalSlider: false,
     lon: null,
     lat: null,
   };
@@ -80,88 +88,91 @@ class SingleCountry extends React.Component {
       videoUrl: city.videoUrl.slice(-11),
     });
 
-            // CURRENCY
-        axios
-            .post("/api/currency", {currency: city.local_currency})
-            .then((response) => {
-                if (!response.data.error) {
-                    this.setState({rates: response.data.data});
-                }
-            });
-        // WEATHER
-        axios
-            .post("/api/weather", {alias: city.capital_alias})
-            .then((response) => {
-                if (!response.data.error) {
-                    this.setState({
-                        temp: response.data.data.temp,
-                        wind: response.data.data.wind,
-                    });
-                    mapboxgl.accessToken =
-                        "pk.eyJ1Ijoic2xhdmFpZGVyIiwiYSI6ImNrbHhxY20xNDF2bDEyb3Azc2h6M3gydW4ifQ.lIJ0H5bCqxE7JmW892Hc6g";
-                    const map = new mapboxgl.Map({
-                        container: "map",
-                        style: "mapbox://styles/mapbox/streets-v11",
-                        center: [
-                            response.data.data.cords.lon,
-                            response.data.data.cords.lat,
-                        ], // starting position [lng, lat]
-                        zoom: 9, // starting zoom
-                    });
-                    new mapboxgl.Marker()
-                        .setLngLat([response.data.data.cords.lon, response.data.data.cords.lat])
-                        .addTo(map);
+    // CURRENCY
+    axios
+      .post("/api/currency", { currency: city.local_currency })
+      .then((response) => {
+        if (!response.data.error) {
+          this.setState({ rates: response.data.data });
+        }
+      });
+    // WEATHER
+    axios
+      .post("/api/weather", { alias: city.capital_alias })
+      .then((response) => {
+        if (!response.data.error) {
+          this.setState({
+            temp: response.data.data.temp,
+            wind: response.data.data.wind,
+            lon: response.data.data.cords.lon,
+            lat: response.data.data.cords.lat,
+          });
+          mapboxgl.accessToken =
+            "pk.eyJ1Ijoic2xhdmFpZGVyIiwiYSI6ImNrbHhxY20xNDF2bDEyb3Azc2h6M3gydW4ifQ.lIJ0H5bCqxE7JmW892Hc6g";
+          const map = new mapboxgl.Map({
+            container: "map",
+            style: "mapbox://styles/mapbox/streets-v11",
+            center: [
+              response.data.data.cords.lon,
+              response.data.data.cords.lat,
+            ], // starting position [lng, lat]
+            zoom: 9, // starting zoom
+          });
+          new mapboxgl.Marker()
+            .setLngLat([
+              response.data.data.cords.lon,
+              response.data.data.cords.lat,
+            ])
+            .addTo(map);
 
-                    // TIME
-                    axios
-                        .post("/api/time", {
-                            lon: response.data.data.cords.lon,
-                            lat: response.data.data.cords.lat,
-                        })
-                        .then((response) => {
-                            if (!response.data.error) {
-                                this.setState({
-                                    date: response.data.data,
-                                });
-                            }
-                        });
-                }
-            });
-    };
-
-    componentDidMount() {
-        if (this.props.countries.length === 0) {
-            axios
-                .post("/api/country", {
-                    type: localStorage.getItem("lang") || "ru",
-                })
-                .then((response) => {
-                    this.props.fetchAll(response.data.data);
+          // TIME
+          axios
+            .post("/api/time", {
+              lon: response.data.data.cords.lon,
+              lat: response.data.data.cords.lat,
+            })
+            .then((response) => {
+              if (!response.data.error) {
+                this.setState({
+                  date: response.data.data,
                 });
-        } else {
-            this.getData();
-        }
-        const id = localStorage.getItem("user");
-        if (id) {
-            const user = {id, type: "auto_login"};
-            axios.post("/api/auth", {user}).then((response) => {
-                if (!response.data.error) {
-                    localStorage.setItem("name", response.data.name);
-                    localStorage.setItem("avatar", response.data.imageUrl);
-                    localStorage.setItem("user", response.data.id);
-                    this.setState({isAuth: true});
-                }
+              }
             });
         }
-    }
+      });
+  };
 
-    componentDidUpdate(prevProps, prevState, snapshot) {
-        if (prevProps.countries !== this.props.countries) {
-            if (this.props.countries.length !== 0) this.getData();
+  componentDidMount() {
+    if (this.props.countries.length === 0) {
+      axios
+        .post("/api/country", {
+          type: localStorage.getItem("lang") || "ru",
+        })
+        .then((response) => {
+          this.props.fetchAll(response.data.data);
+        });
+    } else {
+      this.getData();
+    }
+    const id = localStorage.getItem("user");
+    if (id) {
+      const user = { id, type: "auto_login" };
+      axios.post("/api/auth", { user }).then((response) => {
+        if (!response.data.error) {
+          localStorage.setItem("name", response.data.name);
+          localStorage.setItem("avatar", response.data.imageUrl);
+          localStorage.setItem("user", response.data.id);
+          this.setState({ isAuth: true });
         }
-
+      });
     }
-  
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (prevProps.countries !== this.props.countries) {
+      if (this.props.countries.length !== 0) this.getData();
+    }
+  }
 
   Rate = (value) => {
     const id = localStorage.getItem("user");
@@ -171,8 +182,6 @@ class SingleCountry extends React.Component {
   };
 
   render() {
-    //console.log(this.state.lon);
-
     const opts = {
       height: "260",
       width: "100%",
@@ -220,10 +229,10 @@ class SingleCountry extends React.Component {
           <div className={styles.capital__data_wrapper}>
             <div className={styles.capital__attraction_container}>
               <button
-                className="btn__modal"
-                onClick={() => this.setState({ modalMap: true })}
+                className="btn__modal_attraction"
+                onClick={() => this.setState({ modalSlider: true })}
               >
-                <FullscreenIcon fontSize="large"></FullscreenIcon>
+                <ZoomOutMapIcon style={{ fontSize: 30 }}></ZoomOutMapIcon>
               </button>
               <Swiper
                 className={styles.swiper__attraction}
@@ -301,10 +310,10 @@ class SingleCountry extends React.Component {
 
               <div className={styles.data__container_map}>
                 <button
-                  className="btn__modal"
-                  onClick={() => this.setState({ modalMap: true })}
+                  className="btn__modal_map"
+                  onClick={() => this.setState({ modalSlider: true })}
                 >
-                  <FullscreenIcon fontSize="large"></FullscreenIcon>
+                  <ZoomOutMapIcon style={{ fontSize: 40 }}></ZoomOutMapIcon>
                 </button>
                 <Swiper className={styles.swiper__map}>
                   <SwiperSlide>
@@ -332,25 +341,30 @@ class SingleCountry extends React.Component {
             isOpened={this.state.modalMap}
             onModalClose={() => this.setState({ modalMap: false })}
           />
+          <ModalSlider
+            attractions={this.state.attractions}
+            isOpened={this.state.modalSlider}
+            onModalClose={() => this.setState({ modalSlider: false })}
+          />
         </div>
       </>
-  );
+    );
   }
 }
 
 function mapStateToProps(state) {
-    return {
-        countries: state.countries.countries,
-    };
+  return {
+    countries: state.countries.countries,
+  };
 }
 
 function mapDispatchToProps(dispatch) {
-    return {
-        fetchAll: (data) => dispatch(fetchAll(data)),
-    };
+  return {
+    fetchAll: (data) => dispatch(fetchAll(data)),
+  };
 }
 
 export default connect(
-    mapStateToProps,
-    mapDispatchToProps
+  mapStateToProps,
+  mapDispatchToProps
 )(withRouter(SingleCountry));
