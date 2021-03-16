@@ -15,6 +15,8 @@ class Index extends React.Component {
         isAuth: false,
         filteredCountries: null,
         type: "ru",
+        showRegister: false,
+        showLogin: false
     };
 
     componentDidMount() {
@@ -117,7 +119,8 @@ class Index extends React.Component {
     };
 
     quit = () => {
-        this.setState({isAuth: false});
+        console.log(this.state.isAuth)
+        this.setState({isAuth: !this.state.isAuth});
         localStorage.clear();
     };
 
@@ -150,33 +153,138 @@ class Index extends React.Component {
         this.setState({filteredCountries: null})
     }
 
+    register = () => {
+        this.setState({showRegister: !this.state.showRegister})
+    }
+    
+    login = () => {
+        this.setState({showLogin: !this.state.showLogin})
+    }
+    
+
     render() {
         return (
             <div className={styles.homepage}>
+                
                 <div className={styles.header}>
-                    <select
-                        onChange={(e) => this.changeLang(e)}
-                        value={this.state.type}
-                        name="lang"
-                        id="lang"
-                    >
-                        <option value={"ru"}>RU</option>
-                        <option value={"en"}>EN</option>
-                        <option value={"ge"}>GE</option>
-                    </select>
-                    <Link href="/">Homepage</Link>
-                    <input
-                        type="text"
-                        id={"search"}
-                        onInput={(e) => this.searchText(e)}
-                        placeholder={"Search"}
-                    />
-                    <button className="clear"
-                            onClick={() => this.clear()}>&times;</button>
-                    <button onClick={() => this.searchButton()}>Search</button>
-                    {!this.state.isAuth ? (
-                        <div className={styles.auth}>
-                            <form id={"Register"} onSubmit={(e) => this.RegisterSubmit(e)}>
+                    <div className={styles.select__wrapper}>
+                        <select
+                            onChange={(e) => this.changeLang(e)}
+                            value={this.state.type}
+                            name="lang"
+                            id="lang"
+                            className={styles.select}
+                        >
+                            <option value={"ru"}>RU</option>
+                            <option value={"en"}>EN</option>
+                            <option value={"ge"}>GE</option>
+                        </select>
+                    </div>
+                    <div className={styles.homepageLink}>
+                        <Link  href="/">Homepage</Link>
+                        </div>
+                    <div className={styles.search__wrapper}>
+                        <div>
+                            <input
+                                type="text"
+                                id={"search"}
+                                onInput={(e) => this.searchText(e)}
+                                placeholder={"Search"}
+                            />
+                            <button className="clear"
+                                    onClick={() => this.clear()}>&times;</button>
+                        </div>
+                        <button onClick={() => this.searchButton()}>Search</button>
+                    </div>
+                    {this.state.isAuth ? (
+                        <div className={styles.reg}>
+                            <button onClick={() => this.register()}>Register</button>
+                            <button onClick={() => this.login()}>Login</button>
+                        </div>
+                        
+                    ) : (
+                        <div className={styles.accc}>
+                            <img
+                                className={styles.avatar}
+                                src={this.state.img}
+                                alt="avatar"
+                            />
+                            <p>{this.state.name}</p>
+                            <button className={styles.quit} onClick={() => this.quit()}>quit</button>
+                        </div>
+                    )}
+                </div>
+                
+                {this.props.isConnected ? (
+                    <>
+                        <div className={styles.main}>
+                            {/* <ul> */}
+                                {this.state[
+                                    this.state.filteredCountries
+                                        ? "filteredCountries"
+                                        : "countries"
+                                    ].map((country, index) => {
+                                    return (
+                                        <div className={styles.country__card} key={index}>
+                                            <Link
+                                                href={`/${country.capital_alias}`}
+                                            >
+                                                
+                                                    {/* <hr/> */}
+                                                    <div className={styles.country__wrapper}>
+                                                        
+                                                        {/* <div className={styles.country__info}> */}
+                                                            <p className={styles.country__name}>
+                                                                {country.name}
+                                                            </p>
+                                                            <img
+                                                                className={styles.flag__img}
+                                                                src={country.flagImageUrl}
+                                                                alt={country.flagImageUrl}
+                                                            />
+                                                            <div className={styles.country__raitng}>
+                                                                <Rating
+                                                                    readonly={true}
+                                                                    initialRating={this.getRating(country.rating)}
+                                                                />
+                                                            </div>
+                                                        {/* </div> */}
+
+                                                        <div className={styles.country__map}>
+                                                            <img
+                                                                className={styles.country__map__img}
+                                                                src={country.urlImage}
+                                                                alt={country.urlImage}
+                                                            />
+                                                        </div>
+                                                        {/*                             <p>{country.capital}</p>
+                             */}
+                                                        {/* <p>{country.capital_description}</p> */}
+
+                                                        {/* <img
+                            className={styles.capital__img}
+                            src={country.capitalImageUrl}
+                            alt={country.capitalImageUrl}
+                          /> */}
+                                                        {/* <hr/> */}
+                                                    </div>
+                                                
+                                            </Link>
+                                        </div>
+                                    );
+                                })}
+                            {/* </ul> */}
+                        </div>
+                        
+                    </>
+                ) : null}
+                {this.state.showRegister && <div className={styles.overlay}>
+	                <div className={styles.popup}>
+		            <h2>Register</h2>
+		            <a onClick={() => {this.register()}} className={styles.close} href="#">&times;</a>
+		            <div className={styles.content}>
+                    <div className={styles.auth}>
+                    <form id={"Register"} onSubmit={(e) => this.RegisterSubmit(e)} className={styles.form}>
                                 <label htmlFor="file">
                                     Avatar
                                     <input required id="file" name="avatar" type="file"/>
@@ -204,9 +312,18 @@ class Index extends React.Component {
                                 <br/>
                                 <input type="submit" name="submit"/>
                             </form>
-                            <br/>
+                            </div>
+		            </div>
+	            </div>
+                </div>}
+                {this.state.showLogin && <div className={styles.overlay}>
+	                <div className={styles.popup}>
+		            <h2>Login</h2>
+		            <a onClick={() => {this.login()}} className={styles.close} href="#">&times;</a>
+		            <div className={styles.content}>
+                    <div className={styles.auth}>
+                    <form id={"Login"} onSubmit={(e) => this.LoginSubmit(e)} className={styles.form2}>
                             <h1>Dev [LOGIN] : 1@mail.ru [PASSWORD]:123</h1>
-                            <form id={"Login"} onSubmit={(e) => this.LoginSubmit(e)}>
                                 <label htmlFor="login_email">
                                     Email:
                                     <input
@@ -229,79 +346,10 @@ class Index extends React.Component {
                                 <br/>
                                 <input type="submit" name="submit"/>
                             </form>
-                        </div>
-                    ) : (
-                        <>
-                            <img
-                                className={styles.avatar}
-                                src={this.state.img}
-                                alt="avatar"
-                            />
-                            <p>{this.state.name}</p>
-                            <button onClick={() => this.quit()}>quit</button>
-                        </>
-                    )}
-                </div>
-                {this.props.isConnected ? (
-                    <>
-                        <div className={styles.main}>
-                            <ul>
-                                {this.state[
-                                    this.state.filteredCountries
-                                        ? "filteredCountries"
-                                        : "countries"
-                                    ].map((country, index) => {
-                                    return (
-                                        <div key={index}>
-                                            <Link
-                                                href={`/${country.capital_alias}`}
-                                            >
-                                                <div>
-                                                    <hr/>
-                                                    <div className={styles.country__wrapper}>
-                                                        <div className={styles.country__info}>
-                                                            <p className={styles.country__name}>
-                                                                {country.name}
-                                                            </p>
-                                                            <img
-                                                                className={styles.flag__img}
-                                                                src={country.flagImageUrl}
-                                                                alt={country.flagImageUrl}
-                                                            />
-                                                            <div className={styles.country__raitng}>
-                                                                <Rating
-                                                                    readonly={true}
-                                                                    initialRating={this.getRating(country.rating)}
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                        <div className={styles.country__map}>
-                                                            <img
-                                                                className={styles.country__map__img}
-                                                                src={country.urlImage}
-                                                                alt={country.urlImage}
-                                                            />
-                                                        </div>
-                                                        {/*                             <p>{country.capital}</p>
-                             */}
-                                                        <p>{country.capital_description}</p>
-
-                                                        {/* <img
-                            className={styles.capital__img}
-                            src={country.capitalImageUrl}
-                            alt={country.capitalImageUrl}
-                          /> */}
-                                                        <hr/>
-                                                    </div>
-                                                </div>
-                                            </Link>
-                                        </div>
-                                    );
-                                })}
-                            </ul>
-                        </div>
-                    </>
-                ) : null}
+                            </div>
+		            </div>
+	            </div>
+                </div>}
             </div>
         );
     }
