@@ -404,4 +404,12 @@ header {}
 
 main {}
 
-footer {}
+footer ul{
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-items: center;
+}
+footer ul li{
+	margin-right: 10px;
+}
