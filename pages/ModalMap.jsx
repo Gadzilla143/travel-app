@@ -1,6 +1,7 @@
-import React, { useRef, useEffect, useState, Component } from "react";
-import ReactDOM from "react-dom";
+import React, { Component } from "react";
 import mapboxgl from "mapbox-gl";
+import styles from "../styles/modal.module.css";
+import CancelIcon from "@material-ui/icons/Cancel";
 
 mapboxgl.accessToken =
   "pk.eyJ1Ijoic2xhdmFpZGVyIiwiYSI6ImNrbHhxY20xNDF2bDEyb3Azc2h6M3gydW4ifQ.lIJ0H5bCqxE7JmW892Hc6g";
@@ -27,12 +28,18 @@ class ModalMap extends Component {
       center: [lng, lat],
       zoom: zoom,
     });
+    new mapboxgl.Marker().setLngLat([lng, lat]).addTo(map);
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
+    console.log(this.props);
     if (prevProps !== this.props) {
-      this.setState({ lng: this.props.mapLon });
-      this.setState({ lat: this.props.mapLat });
+      this.setState({
+        lng: this.props.mapLon,
+      });
+      this.setState({
+        lat: this.props.mapLat,
+      });
       this.getMap();
     }
   }
@@ -41,14 +48,22 @@ class ModalMap extends Component {
     return (
       <>
         <div
-          className={`modal_wrapper ${this.props.isOpened ? "open" : "close"}`}
+          className={`modal__map__wrapper ${
+            this.props.isOpened ? "open" : "close"
+          }`}
           style={{ ...this.props.style }}
         >
-          <div className="modal_body" onClick={(e) => e.stopPropagation}>
-            <div className="modal_close" onClick={this.props.onModalClose}>
-              X
+          <div
+            className={styles.modal__body}
+            onClick={(e) => e.stopPropagation}
+          >
+            <div
+              className={styles.modal__close}
+              onClick={this.props.onModalClose}
+            >
+              <CancelIcon style={{ fontSize: 40 }}></CancelIcon>
             </div>
-            <div ref={this.mapContainer} className="map" />
+            <div ref={this.mapContainer} className={styles.map} />
           </div>
         </div>
       </>

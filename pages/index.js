@@ -20,6 +20,7 @@ class Index extends React.Component {
     };
 
     componentDidMount() {
+        window.scrollTo(0, 0)
         if (localStorage.getItem("lang")) {
             this.setState({
                 type: localStorage.getItem("lang"),

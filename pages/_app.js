@@ -1,6 +1,4 @@
 import "../styles/global.css";
-import "../styles/modal.css";
-import "../styles/modalSlider.css";
 import "swiper/swiper.scss";
 import "swiper/components/navigation/navigation.scss";
 import "swiper/components/pagination/pagination.scss";
@@ -8,8 +6,9 @@ import "swiper/components/scrollbar/scrollbar.scss";
 import "swiper/components/effect-cube/effect-cube.scss";
 import Head from "next/head";
 import React from "react";
-import { Provider } from "react-redux";
+import {Provider} from "react-redux";
 import store from "../store/store";
+
 
 function App({ Component, pageProps }) {
   return (
@@ -70,6 +69,7 @@ function App({ Component, pageProps }) {
       </footer>
     </>
   );
+
 }
 
 export default App;
