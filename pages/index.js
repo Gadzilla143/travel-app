@@ -185,17 +185,17 @@ class Index extends React.Component {
                         <Link  href="/">Homepage</Link>
                         </div>
                     <div className={styles.search__wrapper}>
-                        <div>
+                        
                             <input
                                 type="text"
                                 id={"search"}
                                 onInput={(e) => this.searchText(e)}
                                 placeholder={"Search"}
                             />
-                            <button className="clear"
+                            <button className={styles.clear}
                                     onClick={() => this.clear()}>&times;</button>
-                        </div>
-                        <button onClick={() => this.searchButton()}>Search</button>
+                       
+                        <button className={styles.search__btn} onClick={() => this.searchButton()}>Search</button>
                     </div>
                     {this.state.isAuth ? (
                         <div className={styles.reg}>
