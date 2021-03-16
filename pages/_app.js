@@ -18,8 +18,10 @@ function App({ Component, pageProps }) {
         <link
           href="https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.css"
           rel="stylesheet"
+          href
         />
-        
+        <link rel="preconnect" href="https://fonts.gstatic.com"/>
+        <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300&display=swap" rel="stylesheet"/>
       </Head>
       <main>
         <Provider store={store}>
@@ -35,7 +37,7 @@ function App({ Component, pageProps }) {
               style={{
                 width: "30px",
               }}
-              src="https://www.flaticon.com/svg/vstatic/svg/25/25231.svg?token=exp=1615808086~hmac=57aebdd589722aabe9e0a6a59a80b1e2"
+              src="https://seeklogo.com/images/G/github-logo-7880D80B8D-seeklogo.com.png"
             />
           </a>
           <a href="https://github.com/VVK1978" alt="viktor">
@@ -44,7 +46,7 @@ function App({ Component, pageProps }) {
               style={{
                 width: "30px",
               }}
-              src="https://www.flaticon.com/svg/vstatic/svg/25/25231.svg?token=exp=1615808086~hmac=57aebdd589722aabe9e0a6a59a80b1e2"
+              src="https://seeklogo.com/images/G/github-logo-7880D80B8D-seeklogo.com.png"
             />
           </a>
           <a href="https://github.com/Gadzilla143" alt="gadzilla143">
@@ -53,11 +55,11 @@ function App({ Component, pageProps }) {
               style={{
                 width: "30px",
               }}
-              src="https://www.flaticon.com/svg/vstatic/svg/25/25231.svg?token=exp=1615808086~hmac=57aebdd589722aabe9e0a6a59a80b1e2"
+              src="https://seeklogo.com/images/G/github-logo-7880D80B8D-seeklogo.com.png"
             />
           </a>
         </div>
-        <a href="https://rs.school/">
+        <a href="https://rs.school/" className="rss">
           <img
             className="link-img"
             style={{

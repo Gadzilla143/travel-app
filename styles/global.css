@@ -405,3 +405,35 @@ header {}
 main {}
 
 
+footer {
+	display: flex;
+	align-items: center;
+	justify-content: space-around;
+	height: 100px;
+	background: rgb(254, 235, 255);
+}
+
+.git-hub {
+	display: flex;
+	align-items: center;
+	justify-content: space-around;
+	width: 160px;
+	
+}
+
+.rss {
+	transition: .2s;
+}
+
+.rss:hover {
+	transform: scale(1.2);
+}
+
+.git-hub a {
+	transition: .2s;
+}
+
+.git-hub a:hover {
+	transform: scale(1.2);
+}
+
